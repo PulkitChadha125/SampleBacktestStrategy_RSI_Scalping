@@ -14,6 +14,32 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
+# ============================================================================
+# CONFIGURATION - Modify these parameters to customize your strategy
+# ============================================================================
+
+# Technical Indicator Parameters
+EMA_PERIOD = 200          # EMA period (default: 200)
+RSI_PERIOD = 3            # RSI period (default: 3)
+RSI_OVERSOLD = 10         # RSI oversold threshold for BUY signals (default: 10)
+RSI_OVERBOUGHT = 90       # RSI overbought threshold for SELL signals (default: 90)
+BACKCANDLES = 8           # Number of candles to check for EMA trend confirmation (default: 8)
+
+# Strategy Names - Customize these to identify your backtest runs
+STRATEGY_NAMES = {
+    'Strategy1': 'Strategy1_FixedSLTP_Martingale',  # Fixed SL/TP with Martingale
+    'Strategy2': 'Strategy2_ATRBased',              # ATR-Based SL/TP
+    'Strategy3': 'Strategy3_TrailingStop_ATR'        # Trailing Stop with ATR
+}
+
+# Backtest Configuration
+CSV_FILE = "EURUSD_Candlestick_5_M_Data.csv"
+BACKTEST_FOLDER = "backtest"
+BACKTEST_MONTHS = 30      # Number of months to backtest
+
+# ============================================================================
+
+
 def load_and_preprocess_data(csv_file):
     """Load and preprocess the candlestick data."""
     print(f"Loading data from {csv_file}...")
@@ -34,21 +60,40 @@ def load_and_preprocess_data(csv_file):
     return df
 
 
-def calculate_indicators(df):
-    """Calculate technical indicators: EMA200, RSI(3), and ATR."""
-    print("Calculating technical indicators...")
+def calculate_indicators(df, ema_period=200, rsi_period=3):
+    """Calculate technical indicators: EMA, RSI, and ATR.
     
-    df["EMA200"] = ta.ema(df.Close, length=200)
-    df["RSI"] = ta.rsi(df.Close, length=3)
+    Args:
+        df: DataFrame with OHLCV data
+        ema_period: Period for EMA calculation (default: 200)
+        rsi_period: Period for RSI calculation (default: 3)
+    
+    Returns:
+        DataFrame with added indicator columns
+    """
+    print(f"Calculating technical indicators (EMA{ema_period}, RSI{rsi_period})...")
+    
+    ema_col = f"EMA{ema_period}"
+    df[ema_col] = ta.ema(df.Close, length=ema_period)
+    df["RSI"] = ta.rsi(df.Close, length=rsi_period)
     df['ATR'] = df.ta.atr()
     
     print("Indicators calculated successfully")
-    return df
+    return df, ema_col
 
 
-def generate_ema_signal(df, backcandles=8):
-    """Generate EMA trend signal based on price position relative to EMA200."""
-    print("Generating EMA signals...")
+def generate_ema_signal(df, ema_col='EMA200', backcandles=8):
+    """Generate EMA trend signal based on price position relative to EMA.
+    
+    Args:
+        df: DataFrame with EMA column
+        ema_col: Name of the EMA column (default: 'EMA200')
+        backcandles: Number of candles to check for trend confirmation (default: 8)
+    
+    Returns:
+        DataFrame with added EMAsignal column
+    """
+    print(f"Generating EMA signals (checking {backcandles} candles)...")
     
     emasignal = [0] * len(df)
     
@@ -56,11 +101,11 @@ def generate_ema_signal(df, backcandles=8):
         upt = 1  # Uptrend flag
         dnt = 1  # Downtrend flag
         
-        # Check if price stayed above/below EMA200 for the last 'backcandles' periods
+        # Check if price stayed above/below EMA for the last 'backcandles' periods
         for i in range(row-backcandles, row+1):
-            if df.High[row] >= df.EMA200[row]:
+            if df.High[i] >= df[ema_col][i]:
                 dnt = 0  # Price touched or went above EMA, not a strong downtrend
-            if df.Low[row] <= df.EMA200[row]:
+            if df.Low[i] <= df[ema_col][i]:
                 upt = 0  # Price touched or went below EMA, not a strong uptrend
         
         # Assign signal values
@@ -76,21 +121,30 @@ def generate_ema_signal(df, backcandles=8):
     return df
 
 
-def generate_total_signal(df):
-    """Generate final trading signal by combining EMA signal with RSI extremes."""
-    print("Generating total trading signals...")
+def generate_total_signal(df, rsi_oversold=10, rsi_overbought=90):
+    """Generate final trading signal by combining EMA signal with RSI extremes.
+    
+    Args:
+        df: DataFrame with EMAsignal and RSI columns
+        rsi_oversold: RSI threshold for BUY signals (default: 10)
+        rsi_overbought: RSI threshold for SELL signals (default: 90)
+    
+    Returns:
+        DataFrame with added TotSignal column
+    """
+    print(f"Generating total trading signals (RSI oversold: {rsi_oversold}, overbought: {rsi_overbought})...")
     
     TotSignal = [0] * len(df)
     
     for row in range(0, len(df)):
         TotSignal[row] = 0
         
-        # SELL signal: Strong downtrend (EMAsignal=1) AND RSI >= 90 (overbought)
-        if df.EMAsignal[row] == 1 and df.RSI[row] >= 90:
+        # SELL signal: Strong downtrend (EMAsignal=1) AND RSI >= overbought threshold
+        if df.EMAsignal[row] == 1 and df.RSI[row] >= rsi_overbought:
             TotSignal[row] = 1
         
-        # BUY signal: Strong uptrend (EMAsignal=2) AND RSI <= 10 (oversold)
-        if df.EMAsignal[row] == 2 and df.RSI[row] <= 10:
+        # BUY signal: Strong uptrend (EMAsignal=2) AND RSI <= oversold threshold
+        if df.EMAsignal[row] == 2 and df.RSI[row] <= rsi_oversold:
             TotSignal[row] = 2
     
     df['TotSignal'] = TotSignal
@@ -291,11 +345,14 @@ def main():
     print("="*60)
     print("RSI Scalping Strategy - Backtest Execution")
     print("="*60)
-    
-    # Configuration
-    CSV_FILE = "EURUSD_Candlestick_5_M_Data.csv"
-    BACKTEST_FOLDER = "backtest"
-    BACKTEST_MONTHS = 30  # Number of months to backtest
+    print(f"\nConfiguration:")
+    print(f"  EMA Period: {EMA_PERIOD}")
+    print(f"  RSI Period: {RSI_PERIOD}")
+    print(f"  RSI Oversold: {RSI_OVERSOLD}")
+    print(f"  RSI Overbought: {RSI_OVERBOUGHT}")
+    print(f"  Backcandles: {BACKCANDLES}")
+    print(f"  Strategy Names: {STRATEGY_NAMES}")
+    print("="*60)
     
     # Create backtest folder if it doesn't exist
     if not os.path.exists(BACKTEST_FOLDER):
@@ -307,13 +364,13 @@ def main():
         df = load_and_preprocess_data(CSV_FILE)
         
         # Step 2: Calculate indicators
-        df = calculate_indicators(df)
+        df, ema_col = calculate_indicators(df, ema_period=EMA_PERIOD, rsi_period=RSI_PERIOD)
         
         # Step 3: Generate EMA signal
-        df = generate_ema_signal(df, backcandles=8)
+        df = generate_ema_signal(df, ema_col=ema_col, backcandles=BACKCANDLES)
         
         # Step 4: Generate total signal
-        df = generate_total_signal(df)
+        df = generate_total_signal(df, rsi_oversold=RSI_OVERSOLD, rsi_overbought=RSI_OVERBOUGHT)
         
         # Step 5: Prepare backtest data
         dfpl = prepare_backtest_data(df, months=BACKTEST_MONTHS)
@@ -328,7 +385,7 @@ def main():
             Strategy1_FixedSLTP, 
             dfpl, 
             signal_data, 
-            "Strategy1_FixedSLTP_Martingale",
+            STRATEGY_NAMES['Strategy1'],
             BACKTEST_FOLDER
         )
         results['Strategy1'] = stats1
@@ -338,7 +395,7 @@ def main():
             Strategy2_ATRBased, 
             dfpl, 
             signal_data, 
-            "Strategy2_ATRBased",
+            STRATEGY_NAMES['Strategy2'],
             BACKTEST_FOLDER
         )
         results['Strategy2'] = stats2
@@ -348,7 +405,7 @@ def main():
             Strategy3_TrailingStop, 
             dfpl, 
             signal_data, 
-            "Strategy3_TrailingStop_ATR",
+            STRATEGY_NAMES['Strategy3'],
             BACKTEST_FOLDER
         )
         results['Strategy3'] = stats3
@@ -359,7 +416,9 @@ def main():
         print(f"{'='*60}")
         
         comparison_data = {
-            'Strategy': ['Strategy1_FixedSLTP', 'Strategy2_ATRBased', 'Strategy3_TrailingStop'],
+            'Strategy': [STRATEGY_NAMES['Strategy1'], 
+                        STRATEGY_NAMES['Strategy2'], 
+                        STRATEGY_NAMES['Strategy3']],
             'Return [%]': [results['Strategy1']['Return [%]'], 
                           results['Strategy2']['Return [%]'], 
                           results['Strategy3']['Return [%]']],

@@ -102,7 +102,9 @@ def generate_ema_signal(df, ema_col='EMA200', backcandles=8):
         dnt = 1  # Downtrend flag
         
         # Check if price stayed above/below EMA for the last 'backcandles' periods
-        for i in range(row-backcandles, row+1):
+        # Ensure we don't go below index 0
+        start_idx = max(0, row - backcandles + 1)
+        for i in range(start_idx, row + 1):
             if df.High[i] >= df[ema_col][i]:
                 dnt = 0  # Price touched or went above EMA, not a strong downtrend
             if df.Low[i] <= df[ema_col][i]:

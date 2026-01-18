@@ -1,0 +1,20 @@
+Start,End,Duration,Exposure Time [%],Equity Final [$],Equity Peak [$],Return [%],Buy & Hold Return [%],Return (Ann.) [%],Volatility (Ann.) [%],Sharpe Ratio,Sortino Ratio,Calmar Ratio,Alpha [%],Beta,Max. Drawdown [%],Avg. Drawdown [%],Max. Drawdown Duration,Avg. Drawdown Duration,# Trades,Win Rate [%],Best Trade [%],Worst Trade [%],Avg. Trade [%],Max. Trade Duration,Avg. Trade Duration,Profit Factor,Expectancy [%],SQN,Kelly Criterion,_strategy,_equity_curve,_trades
+0.0,2879.0,2879.0,80.17361111111111,105.79942999999996,108.29078,5.799429999999958,1.103888364246491,0.0,,,,0.0,-5.501307211737524,10.23721019058962,-9.163874397794025,-1.4097078687630762,764.0,97.21428571428571,3.0,66.66666666666666,0.4106139134243403,-0.4127077295572157,0.1350091527321018,1528.0,768.6666666666666,1.9868598131789212,0.13576155762944353,0.7495447996219804,0.4395817322786125,CustomStrategy,"         Equity  DrawdownPct  DrawdownDuration
+0     100.00000     0.000000               NaN
+1     100.00000     0.000000               NaN
+2     100.00000     0.000000               NaN
+3     100.00000     0.000000               NaN
+4     100.00000     0.000000               NaN
+...         ...          ...               ...
+2875  105.46725     0.026074               NaN
+2876  105.68219     0.024089               NaN
+2877  105.85805     0.022465               NaN
+2878  105.86782     0.022375               NaN
+2879  105.79943     0.023006             302.0
+
+[2880 rows x 3 columns]","   Size  EntryBar  ExitBar  EntryPrice  ExitPrice  ...  ExitTime  Duration   Tag  Entry_SIGNAL  Exit_SIGNAL
+0  -917        24      541     1.09036    1.09486  ...       541       517  None             1            0
+1  1749       659     2187     1.09592    1.10042  ...      2187      1528  None             0            0
+2   941      2269     2530     1.10167    1.10618  ...      2530       261  None             0            0
+
+[3 rows x 16 columns]"

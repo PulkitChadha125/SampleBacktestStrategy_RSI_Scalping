@@ -1,0 +1,84 @@
+Strategy2_ATRBased - Detailed Backtest Results
+============================================================
+Timestamp: 2026-01-18 14:17:52
+============================================================
+
+Start                                     0.0
+End                                    2879.0
+Duration                               2879.0
+Exposure Time [%]                     8.95833
+Equity Final [$]                    100.52525
+Equity Peak [$]                     102.33121
+Return [%]                            0.52525
+Buy & Hold Return [%]                 1.10389
+Return (Ann.) [%]                         0.0
+Volatility (Ann.) [%]                     NaN
+Sharpe Ratio                              NaN
+Sortino Ratio                             NaN
+Calmar Ratio                              0.0
+Alpha [%]                             0.29452
+Beta                                  0.20901
+Max. Drawdown [%]                     -2.3917
+Avg. Drawdown [%]                    -0.48238
+Max. Drawdown Duration                 1604.0
+Avg. Drawdown Duration              144.92857
+# Trades                                 39.0
+Win Rate [%]                         41.02564
+Best Trade [%]                        0.09036
+Worst Trade [%]                      -0.07114
+Avg. Trade [%]                        0.00177
+Max. Trade Duration                      25.0
+Avg. Trade Duration                   5.61538
+Profit Factor                         1.10773
+Expectancy [%]                        0.00178
+SQN                                   0.25384
+Kelly Criterion                        0.0381
+_strategy                      CustomStrategy
+_equity_curve                      Equity ...
+_trades                       Size  EntryB...
+dtype: object
+
+Trade History:
+============================================================
+    Size  EntryBar  ExitBar  ...   Tag  Entry_SIGNAL  Exit_SIGNAL
+0   -917        24       41  ...  None             1            0
+1    918       297      298  ...  None             2            2
+2    914       299      308  ...  None             0            0
+3    919       403      407  ...  None             0            0
+4    918       428      430  ...  None             0            2
+5    917       431      438  ...  None             2            0
+6   -920       499      500  ...  None             0            0
+7    921       659      663  ...  None             0            0
+8    922       694      697  ...  None             0            0
+9    921       711      718  ...  None             0            0
+10   921       985      991  ...  None             0            0
+11   919       995     1003  ...  None             0            0
+12   919      1008     1012  ...  None             0            0
+13   917      1098     1102  ...  None             0            0
+14   913      1169     1169  ...  None             0            0
+15   910      1217     1217  ...  None             0            0
+16   912      1270     1283  ...  None             2            0
+17  -912      1352     1360  ...  None             0            0
+18   907      1433     1439  ...  None             0            0
+19  -904      1552     1556  ...  None             0            0
+20  -904      1725     1737  ...  None             1            0
+21  -909      1804     1809  ...  None             0            1
+22  -907      1810     1820  ...  None             1            0
+23  -909      1835     1836  ...  None             0            0
+24  -908      1899     1901  ...  None             1            0
+25   904      2160     2162  ...  None             2            0
+26   900      2269     2275  ...  None             0            0
+27   907      2286     2296  ...  None             0            0
+28   913      2436     2442  ...  None             2            0
+29   912      2562     2563  ...  None             2            2
+30   906      2564     2565  ...  None             0            0
+31   915      2588     2595  ...  None             2            0
+32   922      2604     2629  ...  None             0            0
+33  -918      2682     2685  ...  None             0            0
+34  -921      2705     2712  ...  None             0            0
+35  -923      2725     2732  ...  None             1            0
+36  -922      2782     2783  ...  None             1            1
+37  -919      2784     2788  ...  None             1            0
+38   915      2810     2811  ...  None             2            0
+
+[39 rows x 16 columns]
